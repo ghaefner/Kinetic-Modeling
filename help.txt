@@ -1,0 +1,147 @@
+##### Programme und ihre Erklärungen:
+
+#######################
+Batch_PatlakAnalysis.m:
+#######################
+
+Wrapper-function to manage directories and calculate everything
+
+Definiere die Umgebung:
+	- Path für die Images (Input Ordner)
+	- Path für Output
+	- Path für Reference VOI
+	
+	- Output Ordner
+
+Finde alle Dateien mit .nii Endungen im Input Ordner
+	- Errechne die Anzahl an Files
+
+Loope über alle Files:
+	- Definiere jedes Mal den Bild-Path (= Input Ordner + name des i-ten Bildes)
+	- Anwenden der fcnPatlakAnalysis
+
+Sichere den Output:
+	- Ergebnis der fcnPatlakAnalysis in Ordner: Output + Ki_i + name
+	- Display?
+
+###############################################################################
+
+################################################
+calculateIntegralsOfActivityInReferenceRegion.m:
+################################################
+
+Function to calculate the integrals of activity in the reference region
+
+Input Parameter:
+	- Zeitpunkte (timepoints)
+	- Startpunkt (startFrame)
+	
+
+Ausgabe:
+	- Integral über Trapez-Funktion
+	- X-Koordinate: Zeitpunkte
+	- Y-Koordinate: TAC-Werte
+
+###############################################################################
+
+##############
+calculateKi.m:
+##############
+
+Function to calculate the Patlak_slop and Patlak_intercept
+
+Input Parameter:
+	- Time-to-Amplitude-Converter (TAC)
+	- Zeiten (timepoints)
+	- Startpunkt (startFrame)
+	- Time-to-Amplitude-Converter Signal (TACFromReferenceRegion)
+	- IntegralsOfActivityInReferenceRegion
+
+x-y-Koordinaten füllen:
+	- x[i] = IntegralsOfActivityInReferenceRegion[i] / TACFromReferenceRegion[i]
+	- y[i] = TAC[i]/TACFromReferenceRegion[i]
+
+Polynomial-Fit:
+	- Lineare Funktion p2 (in Matrix Formalismus)
+	- p2(2) = slop ; p2(1) = intercept
+
+###############################################################################
+
+################################
+extractTACFromReferenceRegion.m:
+################################
+
+Function to extract TAC-Signals in the reference region using the 4D image and a reference VOI
+
+Input-Parameter:
+	- Bilddatei (image4D)
+	- Volume of Interest (referenceVOI)
+
+Check für Dimension des Bildes:
+	- size of image 4D
+	- size of referenceVOI 
+
+Loope über die image size:
+	- currentImage, summe über VOI = sum(currentImage(:));
+	- TAC_Reference als Verhältnis von sumOfVOI / nonzero elements in referenceVOI
+
+Ausgabe:
+	- TAC_ReferenceVOI
+
+###############################################################################
+
+######################
+extractTACFromVoxel.m:
+######################
+
+Function to calculate the TAC-Signal from the current voxel
+
+Input-Parameter:
+	- Bild (image4D)
+	- Koordinaten
+
+Ausgabe:
+	- TAC[i] = (4,i)-te Eintrag mit (1,2,3)=(x,y,z) Koordinaten
+
+
+###############################################################################
+
+####################
+fcnPatlakAnalysis.m:
+####################
+
+Function to calculate the PatlakSlopes for all coordinates from one image
+
+Input-Parameter:
+	- Pfad für das Bild (pathInputImage)
+	- Pfad für das ReferenceVOI (pathReferenceVOI)
+	- Startpunkt (startframe)
+	- Zeitpunkte (timepoints)
+
+Vorbereitung:
+	- Lade das Bild/ReferenceVOI
+	- sizes
+	- TAC_ReferenceVOI + IntegralsOfActivity berechnen
+	- leeres PatlakSlopes array
+
+Loopen über alle (k.A.):
+	- TAC = extractTACFromVovel(image4D, [i j k]) - TACs für alle Koordinaten i,j,k
+	- PatlakSlopes(i,j,k) für alle Koordinaten berechnen
+
+Ausgabe:
+	-Für ein bestimmtes Bild bei die PatlakSlopes für alle Koordinaten
+
+
+###############################################################################
+
+#################################
+PatlakAnalysis_NormalizedImage.m:
+#################################
+
+Vorbereitung:
+	- analog zu fcnPatlakAnalysis.m
+
+Loopen wie in fcnPatlakAnalysis.m
+
+Danach k.A.
+
