@@ -2,10 +2,11 @@ function [ Patlak_slope, Patlak_intercept ] = calculateKi(TAC, timepoints, start
 %UNTITLED7 Summary of this function goes here
 %   Detailed explanation goes here
 
+%% Define and fill in x and y arrays (i.e. generating the patlak plot)
 lengthTimepoints = length(timepoints);
 
 x = zeros(1,lengthTimepoints-startFrame);
-x = zeros(1,lengthTimepoints-startFrame);
+y = zeros(1,lengthTimepoints-startFrame);
 
 for i = startFrame:lengthTimepoints
     %disp(i);
@@ -14,6 +15,7 @@ for i = startFrame:lengthTimepoints
     
 end
 
+%% Linear Fit to obtain patlak parameters
 
 % % Apply linear model using polyfit... this is slow...
 % p = polyfit(x,y,1);

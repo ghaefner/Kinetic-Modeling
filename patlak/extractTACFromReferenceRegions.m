@@ -14,11 +14,13 @@ else
     disp('Dimesions of image4D and reference VOI are  equal. OK!.');
 end
 
+TAC_ReferenceVOI = zeros(1,size(image4D.img,4));
+
 %% Run through time frames
+% Calculate the reference image and sum it up for the TAC_ReferenceVOI
 
 for i = 1:size(image4D.img,4)
 
-    %disp(i);
     currentImage = squeeze(image4D.img(:,:,:,i)).*referenceVOI; %Elementweise Multiplikation mit referenceVOI
     sumOfVOI = sum(currentImage(:));
     TAC_ReferenceVOI(i) = sumOfVOI / nnz(referenceVOI); %non-zero elements of referenceVOI

@@ -5,8 +5,8 @@
  timepoints = 1:9;
  startframe = 4;
 
-image4D = load_nii('testImages/TestEcat_rsl.nii');
-referenceVOI_nifti = load_nii('testImages/TestEcat_rsl_times_0_plus_TestEcat_rsl_VOI.nii');
+image4D = load_nii('/media/mmni_raid2/Filesystem/ghaefner/Kinetic-Modeling/kfors-h4257p-dopa-2015.3.12.13.31.27_em_3D_rsl.nii');
+referenceVOI_nifti = load_nii('/media/mmni_raid2/Filesystem/ghaefner/Kinetic-Modeling/AAL_79x95x78.nii');
 referenceVOI = referenceVOI_nifti.img;
 
 sizeInputImage = size(image4D.img);
