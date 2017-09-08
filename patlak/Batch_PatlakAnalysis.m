@@ -1,6 +1,6 @@
 %% Environment
 
-pathImagesToProcessFolder = '/media/mmni_raid2/Filesystem/ghaefner/Kinetic-Modeling/images/';
+pathImagesToProcessFolder = '/media/mmni_raid2/Filesystem/ghaefner/Kinetic-Modeling/testImages/';
 pathOutputFolder = [pathImagesToProcessFolder, 'Patlak/'];
 pathReferenceVOI = [pathImagesToProcessFolder, '../ReferenceVOI/AAL_occipital_49-54_79x95x78.nii'];
 
@@ -13,11 +13,16 @@ numberOfFiles=length(subj);
 
 %% Run through all files in the input folder
 
+tic;
+
+frames = 1:9;
+startframe = 1;
+
 for FileNumber = 1:numberOfFiles
     
     currentImagePath = [pathImagesToProcessFolder subj(FileNumber).name];
     
-    currentPatlakSlopesNii = fcnPatlakAnalysis(currentImagePath,pathReferenceVOI, 4, 1:9);
+    currentPatlakSlopesNii = fcnPatlakAnalysis(currentImagePath,pathReferenceVOI, startframe, frames);
     
     %% Save output
     save_nii(currentPatlakSlopesNii, [pathOutputFolder 'Ki_' subj(FileNumber).name]);
@@ -28,6 +33,8 @@ end
 
 disp('Done');
 
+toc;
+
 %% Calculate the means of patlak slopes and write them into a File
-pixel = [10,10,10];
+pixel = [50,25,40];
 calcSlopeROI(pathOutputFolder, pixel);

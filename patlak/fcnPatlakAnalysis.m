@@ -16,7 +16,7 @@ IntegralsOfActivityInReferenceRegion = calculateIntegralsOfActivityInReferenceRe
 %% Calculate the PatlakSlopes using calculateKi for every pixel
 PatlakSlopes = single(zeros(sizeInputImage(1),sizeInputImage(2),sizeInputImage(3)));
 
-% Ranges are hardcoded because of parralelization
+% Ranges are hardcoded because of parallelization
 parfor i = 1:79
     for j = 1:95
         for k = 1:78
@@ -26,11 +26,12 @@ parfor i = 1:79
             
         end
     end
-    disp(i);
+    %disp(i);
 end
 
 % PatlakSlopesNii = referenceVOInii;
 % PatlakSlopesNii.img = PatlakSlopes;
+%disp( [ 'PatlakSlopes: ', PatlakSlopes ] );
 
 image4D.hdr.dime.dim(1) = 3;
 image4D.hdr.dime.dim(5) = 1;

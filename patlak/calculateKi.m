@@ -31,13 +31,13 @@ Patlak_slope = p2(2);
 Patlak_intercept = p2(1);
 
 
-% Plotting of linear regression
-%
-% plot(x,y,'*');
-% axis([0 max(x)*1.2 0 max(y)*1.2]);
-% hold on
-% plot(x, x*Patlak_slope+Patlak_intercept);
-% hold off
+%% Plotting of linear regression
+% 
+%  plot(x(1,:),y(1,:),'*');
+%  axis([0 max(x)*1.2 0 max(y)*1.2]);
+%  hold on
+%  plot(x, x*Patlak_slope+Patlak_intercept);
+%  hold off
 
 end
 
