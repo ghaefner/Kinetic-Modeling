@@ -1,3 +1,6 @@
+clear all;
+clc
+
 %% Environment
 
 pathImagesToProcessFolder = '/media/mmni_raid2/Filesystem/ghaefner/Kinetic-Modeling/testImages/';
@@ -37,4 +40,5 @@ toc;
 
 %% Calculate the means of patlak slopes and write them into a File
 pixel = [50,25,40];
-calcSlopeROI(pathOutputFolder, pixel);
+meanSlopesROI = calcSlopeROI(pathOutputFolder, pixel);
+disp(meanSlopesROI);

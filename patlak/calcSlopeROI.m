@@ -36,7 +36,7 @@ for j = 1:numberOfImages
     
 end
 
-disp(meanSlopeROI);
+%disp(meanSlopeROI);
 
 end
 

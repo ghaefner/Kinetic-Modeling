@@ -16,7 +16,7 @@ numberOfFiles=length(subj);
 tic;
 
 frames = 1:9;
-startframe = 7;
+startframe = 4;
 
 for FileNumber = 1:numberOfFiles
     
@@ -25,7 +25,7 @@ for FileNumber = 1:numberOfFiles
     currentLoganSlopesNii = fcnLoganAnalysis(currentImagePath,pathReferenceVOI, startframe, frames);
     
     %% Save output
-    save_nii(currentLoganSlopesNii, [pathOutputFolder 'Logan_' subj(FileNumber).name]);
+    save_nii(currentLoganSlopesNii, [pathOutputFolder 'Logan_' num2str(startframe) '_' subj(FileNumber).name]);
     
     disp(['Processed ' num2str(FileNumber) ' of ' num2str(numberOfFiles) ' Files. ' subj(FileNumber).name]);
     
@@ -37,4 +37,6 @@ toc;
 
 %% Calculate the means of patlak slopes and write them into a File
 pixel = [50,25,40];
-calcSlopeROI(pathOutputFolder, pixel);
+
+meanSlopesROI = calcSlopeROI(pathOutputFolder, pixel);
+disp(meanSlopesROI);
