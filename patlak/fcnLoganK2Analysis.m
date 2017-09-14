@@ -1,4 +1,4 @@
-function [ LoganSlopes ] = fcnLoganAnalysis ( pathInputImage, pathReferenceVOI, startframe, timepoints )
+function [ LoganSlopesK2 ] = fcnLoganK2Analysis ( pathInputImage, pathReferenceVOI, startframe, timepoints )
 %UNTITLED3 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -20,8 +20,9 @@ LoganSlopes = single(zeros(xDim,yDim,zDim));
 % Take timepoints.*10 for calculating the integrals because 1 frame
 % corresponds to 10 minutes. Change here, if needed.
 
+k2_prime = 18304.0;
 TAC_ReferenceVOI = extractTACFromReferenceRegions( image4D, referenceVOI );
-IntegralsOfActivityInReferenceRegion = calculateIntegralsOfActivityInReferenceRegion(timepoints, 1, TAC_ReferenceVOI);
+IntegralsOfActivityInReferenceRegion = calculateIntegralsOfActivityInReferenceRegion(timepoints.*10, 1, TAC_ReferenceVOI);
 
 
 parfor i = 1:xDim
@@ -29,8 +30,8 @@ parfor i = 1:xDim
         for k = 1:zDim
             
             TAC = extractTACFromVoxel(image4D, [i j k]);            
-            IntegralsOfActivityInVoxel = calculateIntegralsOfActivityInVoxel( timepoints,1,TAC );
-            LoganSlopes(i,j,k) = calcLogan(timepoints, startframe, TAC, IntegralsOfActivityInVoxel, IntegralsOfActivityInReferenceRegion);
+            IntegralsOfActivityInVoxel = calculateIntegralsOfActivityInVoxel( timepoints.*10,1,TAC );
+            LoganSlopes(i,j,k) = calcLoganK2(TAC, timepoints, startframe, IntegralsOfActivityInVoxel, IntegralsOfActivityInReferenceRegion, k2_prime, TAC_ReferenceVOI);
             
         end
     end
@@ -41,7 +42,7 @@ image4D.hdr.dime.dim(1) = 3;
 image4D.hdr.dime.dim(5) = 1;
 image4D.img = LoganSlopes;
 
-LoganSlopes = image4D;
+LoganSlopesK2 = image4D;
 
 
 end

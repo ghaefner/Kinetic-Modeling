@@ -15,13 +15,11 @@ zDim = sizeInputImage(3);
 
 %% Calculate the TAC_ReferenceVOI and activity integral
 TAC_ReferenceVOI = extractTACFromReferenceRegions( image4D, referenceVOI );
-% Factor 10 because timepoints (frames) equal 10 minuts steps
-IntegralsOfActivityInReferenceRegion = calculateIntegralsOfActivityInReferenceRegion(timepoints.*10, 1, TAC_ReferenceVOI);
+IntegralsOfActivityInReferenceRegion = calculateIntegralsOfActivityInReferenceRegion(timepoints, 1, TAC_ReferenceVOI);
 
-%% Calculate the PatlakSlopes using calculateKi for every pixel
+%% Calculate the PatlakSlopes using calculateKi for every voxel
 PatlakSlopes = single(zeros(xDim,yDim,zDim));
 
-% Ranges are hardcoded because of parallelization
 parfor i = 1:xDim
     for j = 1:yDim
         for k = 1:zDim

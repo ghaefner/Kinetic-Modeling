@@ -15,7 +15,7 @@ IntegralsOfActivityInVoxel = zeros(1,length(timepoints)-1);
 
 for i=(startFrame+1):length(timepoints)
 
-    IntegralsOfActivityInVoxel(i-1) = trapz(timepoints(1:i),TAC(1:i));
+    IntegralsOfActivityInVoxel(i-1) = trapz(timepoints(1:i).*10,TAC(1:i));
 
 end
 

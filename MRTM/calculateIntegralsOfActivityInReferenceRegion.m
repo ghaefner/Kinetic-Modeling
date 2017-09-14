@@ -15,7 +15,7 @@ IntegralsOfActivityInRegion = zeros(1,length(timepoints)-1);
 
 for i=(startFrame+1):length(timepoints)
 
-    IntegralsOfActivityInRegion(i-1) = trapz(timepoints(1:i),TACFromReferenceRegion(1:i));
+    IntegralsOfActivityInRegion(i-1) = trapz(timepoints(1:i).*10,TACFromReferenceRegion(1:i));
 
 end
 

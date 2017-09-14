@@ -1,5 +1,5 @@
-function [ Logan_slope, Logan_intercept ] = calcLogan( timepoints, startFrame, TAC, IntegralsOfActivityInReferenceRegion, IntegralsOfActivityInVoxel )
-%UNTITLED4 Summary of this function goes here
+function [ LoganSlopeK2, LoganInterceptK2 ] = calcLoganK2( TAC,  timepoints, startFrame, IntegralsOfActivityInReferenceRegion, IntegralsOfActivityInVoxel, k2_prime, TAC_ReferenceVOI )
+%UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
 %% Define and fill in x and y arrays (i.e. generating the logan plot)
@@ -11,15 +11,17 @@ y = zeros(1,lengthTimepoints-startFrame);
 
 for i = startFrame:lengthTimepoints
     y(i-startFrame+1) = IntegralsOfActivityInVoxel(i)/TAC(i);
-    x(i-startFrame+1) = IntegralsOfActivityInReferenceRegion(i)/TAC(i);
+    x(i-startFrame+1) = (IntegralsOfActivityInReferenceRegion(i)+TAC_ReferenceVOI(i)*k2_prime)/TAC(i);
     
 end
 
 %% Linear Fit to obtain logan parameters
 
 p2 = [ones(length(x),1) ,reshape(x,length(x),1)] \ reshape(y,length(y),1);
-Logan_slope = p2(2);
-Logan_intercept= p2(1);
+LoganSlopeK2 = p2(2);
+LoganInterceptK2= p2(1);
 
 end
+
+
 
