@@ -7,7 +7,7 @@ sizeInputImage = size(image4D.img);
 sizeInputImage = sizeInputImage(1:3);
 if ~isequal(size(referenceVOI) , sizeInputImage) %tilde ~ means NOT
     TAC_ReferenceVOI =1;
-    disp('Dimesions of image4D and reference VOI are not equal. abort.');
+    disp('ERROR: Dimesions of image4D and reference VOI are not equal.');
     return
 else
     

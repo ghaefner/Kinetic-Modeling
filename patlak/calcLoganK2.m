@@ -1,4 +1,4 @@
-function [ LoganSlopeK2, LoganInterceptK2 ] = calcLoganK2( TAC,  timepoints, startFrame, IntegralsOfActivityInReferenceRegion, IntegralsOfActivityInVoxel, k2_prime, TAC_ReferenceVOI )
+function [ LoganSlopeK2, LoganInterceptK2 ] = calcLoganK2( TAC,  timepoints, startFrame, IntegralsOfActivityInReferenceRegion, IntegralsOfActivityInVoxel, averageK2Prime, TAC_ReferenceVOI )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -11,7 +11,7 @@ y = zeros(1,lengthTimepoints-startFrame);
 
 for i = startFrame:lengthTimepoints
     y(i-startFrame+1) = IntegralsOfActivityInVoxel(i)/TAC(i);
-    x(i-startFrame+1) = (IntegralsOfActivityInReferenceRegion(i)+TAC_ReferenceVOI(i)*k2_prime)/TAC(i);
+    x(i-startFrame+1) = (IntegralsOfActivityInReferenceRegion(i)+TAC_ReferenceVOI(i)*averageK2Prime)/TAC(i);
     
 end
 

@@ -1,4 +1,4 @@
-function [ PatlakSlopes ] = fcnPatlakAnalysis(pathInputImage, pathReferenceVOI, startframe, timepoints)
+function [ PatlakSlopes ] = fcnPatlakAnalysis(pathInputImage, pathReferenceVOI, timepoints, startFrame)
 
 %% Load image and referenceVOI
 image4D = load_nii(pathInputImage);
@@ -15,7 +15,7 @@ zDim = sizeInputImage(3);
 
 %% Calculate the TAC_ReferenceVOI and activity integral
 TAC_ReferenceVOI = extractTACFromReferenceRegions( image4D, referenceVOI );
-IntegralsOfActivityInReferenceRegion = calculateIntegralsOfActivityInReferenceRegion(timepoints, 1, TAC_ReferenceVOI);
+IntegralsOfActivityInReferenceRegion = calculateIntegralsOfActivityInReferenceRegion(timepoints, startFrame, TAC_ReferenceVOI);
 
 %% Calculate the PatlakSlopes using calculateKi for every voxel
 PatlakSlopes = single(zeros(xDim,yDim,zDim));
@@ -25,13 +25,14 @@ parfor i = 1:xDim
         for k = 1:zDim
             
             TAC = extractTACFromVoxel(image4D, [i j k]);
-            PatlakSlopes(i,j,k) = calculateKi(TAC, timepoints, startframe, TAC_ReferenceVOI, IntegralsOfActivityInReferenceRegion);
+            PatlakSlopes(i,j,k) = calculateKi(TAC, timepoints, startFrame, TAC_ReferenceVOI, IntegralsOfActivityInReferenceRegion);
             
         end
     end
     %disp(i);
 end
-
+disp(PatlakSlopes);
+disp(sum(PatlakSlopes(:)));
 % PatlakSlopesNii = referenceVOInii;
 % PatlakSlopesNii.img = PatlakSlopes;
 %disp( [ 'PatlakSlopes: ', PatlakSlopes ] );

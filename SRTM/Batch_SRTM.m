@@ -1,9 +1,14 @@
+tic;
+
 %% Environment
 
 pathImagesToProcessFolder = '/media/mmni_raid2/Filesystem/ghaefner/Kinetic-Modeling/testImages/';
-pathOutputFolder = [pathImagesToProcessFolder, 'Patlak/'];
+pathOutputFolder = [pathImagesToProcessFolder, 'SRTM/'];
 pathReferenceVOI = [pathImagesToProcessFolder, '../ReferenceVOI/AAL_occipital_49-54_79x95x78.nii'];
-hold on
+
+% Create output directory
+mkdir(pathOutputFolder);
+
 % Find all Files with .nii-Ending in Input Folder
 subj=dir(strcat(pathImagesToProcessFolder,'*.nii'));
 numberOfFiles=length(subj);
@@ -12,23 +17,24 @@ numberOfFiles=length(subj);
 referenceVOInii = load_nii(pathReferenceVOI);
 referenceVOI = referenceVOInii.img;
 
-%% Loop over all files
+%% Define parameters
+timepoints = 1:9;
+startFrame = 1;
 
-ROI = [ 20 40 60 ]; % Set a random voxel for test
-timepoints = 0:9;
-timeInterval = 10; % min
+%% Loop over all files
 
 for FileNumber = 1:numberOfFiles
     
     currentImagePath = [pathImagesToProcessFolder subj(FileNumber).name];
     currentImage = load_nii(currentImagePath);
  
-    TAC_ReferenceVOI = extractTACFromReferenceRegions(currentImage,referenceVOI);
-    TAC = extractTACFromVoxel(currentImage,ROI);
-    TAC_ReferenceVOI = [0 TAC_ReferenceVOI];
-    TAC = [0 TAC];
-    %ratioTAC = TAC/TAC_ReferenceVOI;
+    currentBindingPotentialNii = fcnSRTM(currentImagePath,pathReferenceVOI, timepoints, startFrame);
     
-    plot(timepoints,TAC,'*');
-    
+    %% Save Output
+    save_nii(currentBindingPotentialNii, [pathOutputFolder 'BP_SRTM_' subj(FileNumber).name]);
+        
+    disp(['Processed ' num2str(FileNumber) ' of ' num2str(numberOfFiles) ' Files. ' subj(FileNumber).name]);
+
 end
+
+toc;

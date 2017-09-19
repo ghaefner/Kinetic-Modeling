@@ -1,6 +1,8 @@
+tic;
+
 %% Environment
 
-pathImagesToProcessFolder = '/media/mmni_raid2/Filesystem/ghaefner/Kinetic-Modeling/testImages/';
+pathImagesToProcessFolder = '/media/mmni_raid2/Filesystem/ghaefner/Kinetic-Modeling/images/';
 pathOutputFolder = [pathImagesToProcessFolder, 'Logan/'];
 pathReferenceVOI = [pathImagesToProcessFolder, '../ReferenceVOI/AAL_occipital_49-54_79x95x78.nii'];
 
@@ -12,8 +14,6 @@ subj=dir(strcat(pathImagesToProcessFolder,'*.nii'));
 numberOfFiles=length(subj);
 
 %% Run through all files in the input folder
-
-tic;
 
 frames = 1:9;
 startframe = 4;

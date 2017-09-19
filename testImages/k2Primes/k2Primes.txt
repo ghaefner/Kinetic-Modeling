@@ -1,0 +1,3 @@
+% MRTM Calculation from
+% 18-Sep-2017
+% k2Prime values given in 1/min
