@@ -17,8 +17,6 @@ zDim = sizeInputImage(3);
 LoganSlopes = single(zeros(xDim,yDim,zDim));
 
 %% Calculate the TAC_ReferenceVOI and activity integral
-% Take timepoints.*10 for calculating the integrals because 1 frame
-% corresponds to 10 minutes. Change here, if needed.
 
 TAC_ReferenceVOI = extractTACFromReferenceRegions( image4D, referenceVOI );
 IntegralsOfActivityInReferenceRegion = calculateIntegralsOfActivityInReferenceRegion(timepoints, 1, TAC_ReferenceVOI);

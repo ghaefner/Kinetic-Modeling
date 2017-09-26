@@ -1,4 +1,4 @@
-function [ LoganSlopesK2 ] = fcnLoganK2Analysis ( pathInputImage, pathReferenceVOI, averageK2Prime, startframe, timepoints )
+function [ DVRs ] = fcnLoganK2Analysis ( pathInputImage, pathReferenceVOI, averageK2Prime, startframe, timepoints )
 %UNTITLED3 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -14,7 +14,7 @@ xDim = sizeInputImage(1);
 yDim = sizeInputImage(2);
 zDim = sizeInputImage(3);
 
-LoganSlopes = single(zeros(xDim,yDim,zDim));
+DVRs = single(zeros(xDim,yDim,zDim));
 
 %% Calculate the TAC_ReferenceVOI and activity integral
 
@@ -26,21 +26,21 @@ IntegralsOfActivityInReferenceRegion = calculateIntegralsOfActivityInReferenceRe
 parfor i = 1:xDim
     for j = 1:yDim
         for k = 1:zDim
-            
             TAC = extractTACFromVoxel(image4D, [i j k]);            
-            IntegralsOfActivityInVoxel = calculateIntegralsOfActivityInVoxel( timepoints.*10,1,TAC );
-            LoganSlopes(i,j,k) = calcLoganK2(TAC, timepoints, startframe, IntegralsOfActivityInVoxel, IntegralsOfActivityInReferenceRegion, averageK2Prime, TAC_ReferenceVOI);
+            IntegralsOfActivityInVoxel = calculateIntegralsOfActivityInVoxel( timepoints,1,TAC );
+            DVRs(i,j,k) = calcLoganK2(TAC, timepoints, startframe, IntegralsOfActivityInVoxel, IntegralsOfActivityInReferenceRegion, averageK2Prime, TAC_ReferenceVOI);
             
         end
     end
 end
-
+% Eliminate unphysiological values
+%DVRs = DVRs.*double(DVRs < 20);
 
 image4D.hdr.dime.dim(1) = 3;
 image4D.hdr.dime.dim(5) = 1;
-image4D.img = LoganSlopes;
+image4D.img = DVRs;
 
-LoganSlopesK2 = image4D;
+DVRs = image4D;
 
 
 end

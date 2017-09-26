@@ -1,12 +1,9 @@
+function [meanSlopesROI ] = Logan ( pathImagesToProcessFolder, pathReferenceVOI, pixelOfInterest, sizeROI, startframe, lengthFrame )
+
 tic;
-
-%% Environment
-
-pathImagesToProcessFolder = '/media/mmni_raid2/Filesystem/ghaefner/PET_images/testImages/';
-pathOutputFolder = [pathImagesToProcessFolder, 'Logan/'];
-pathReferenceVOI = [pathImagesToProcessFolder, '../ReferenceVOI/AAL_occipital_49-54_79x95x78.nii'];
-
 %Create Output Directory
+pathImagesToProcessFolder = [pathImagesToProcessFolder, '/'];
+pathOutputFolder = [pathImagesToProcessFolder, 'Logan/'];
 mkdir(pathOutputFolder);
 
 %Find all Files with .nii-Ending in Input Folder
@@ -15,14 +12,11 @@ numberOfFiles=length(subj);
 
 %% Run through all files in the input folder
 
-frames = 1:9;
-startframe = 4;
-
 for FileNumber = 1:numberOfFiles
     
     currentImagePath = [pathImagesToProcessFolder subj(FileNumber).name];
-    
-    currentLoganSlopesNii = fcnLoganAnalysis(currentImagePath,pathReferenceVOI, startframe, frames);
+
+    currentLoganSlopesNii = fcnLoganAnalysis(currentImagePath,pathReferenceVOI, startframe, lengthFrame,pixelOfInterest);
     
     %% Save output
     save_nii(currentLoganSlopesNii, [pathOutputFolder 'Logan_' subj(FileNumber).name]);
@@ -33,10 +27,7 @@ end
 
 disp('Done');
 
-toc;
+meanSlopesROI = calcSlopeROI(pathOutputFolder, pixelOfInterest,sizeROI);
 
-%% Calculate the means of patlak slopes and write them into a File
-pixel = [50,25,50];
+end
 
-meanSlopesROI = calcSlopeROI(pathOutputFolder, pixel);
-disp(meanSlopesROI);

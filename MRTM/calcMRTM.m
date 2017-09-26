@@ -1,29 +1,26 @@
-function [ BP, k2Prime ] = calcMRTM( timepoints, startFrame, TAC, TAC_ReferenceVOI, IntegralsOfActivityInRegion, IntegralsOfActivityInVoxel )
+function [ BP, k2Prime, chiSquare ] = calcMRTM( timepoints, startFrame, TAC, TAC_ReferenceVOI, IntegralsOfActivityInRegion, IntegralsOfActivityInVoxel )
 %UNTITLED4 Summary of this function goes here
 %   Detailed explanation goes here
 
 %% Define and fill in arrays 
 lengthTimepoints = length(timepoints);
-data = zeros(4,lengthTimepoints-startFrame+1);
+xValues = zeros(lengthTimepoints,3);
+yValues = zeros(lengthTimepoints,1);
 
-for j = startFrame:lengthTimepoints
-    data(1,j-startFrame+1) = IntegralsOfActivityInRegion(j);
-    data(2,j-startFrame+1) = IntegralsOfActivityInVoxel(j);
-    data(3,j-startFrame+1) = TAC_ReferenceVOI(j);
-    data(4,j-startFrame+1) = TAC(j);
-    
-end
+% Use 
+id = startFrame:lengthTimepoints;
+
+xValues(id-startFrame+1,1) = IntegralsOfActivityInRegion(id)./TAC(id);
+xValues(id-startFrame+1,2) = TAC_ReferenceVOI(id)./TAC(id);
+xValues(id-startFrame+1,3) = 1;
+yValues(id-startFrame+1) = IntegralsOfActivityInVoxel(id)./TAC(id);
 
 
-%% Define the function according to the MRTM model
-F = @(coeffs,time) - coeffs(1) * data(1,time) + coeffs(2) * data(2,time) - coeffs(3) * data(3,time);
-initialValues = [1.,0.5,1.];
-
-% Fitting procedure using lsqcurvefit
-options=optimset('Display','off');
-[coeffs] = lsqcurvefit(F,initialValues,(1:(lengthTimepoints-startFrame+1)),data(4,:),[],[],options);
+%% Use 'regress' operation for multilinear regression
+[coeffs, ~, res] = regress(yValues,xValues);
+chiSquare = sum(res.^2)/(sum(yValues(:)));
 
 %% Output values
-DVR = abs(coeffs(1)/coeffs(2));
-k2Prime = abs(coeffs(3)) / abs(coeffs(1)); % [ 1/min ]
-BP = abs(DVR - 1.);
+DVR = abs(coeffs(1));
+k2Prime = DVR / abs(coeffs(2)); % [ 1/min ]
+BP = DVR - 1.;

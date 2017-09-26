@@ -1,6 +1,9 @@
-function [ IntegralsOfActivityInRegion ] = calculateIntegralsOfActivityInReferenceRegion(timepoints,startFrame,TACFromReferenceRegion)
+function [ IntegralsOfActivityInRegion ] = calculateIntegralsOfActivityInReferenceRegion(startFrame,TACFromReferenceRegion, lengthFrame,numberOfFrames)
 %UNTITLED5 Summary of this function goes here
 %   Detailed explanation goes here
+
+timepoints = 1:length(TACFromReferenceRegion);
+lengthFrame = lengthFrame * numberOfFrames;
 
 % Add zeros both to TAC and timepoints to include the origin in the
 % Time-Activity Curve
@@ -14,7 +17,7 @@ TACFromReferenceRegion = [0 TACFromReferenceRegion];
 IntegralsOfActivityInRegion = zeros(1,length(timepoints)-1);
 
 for j=(startFrame+1):length(timepoints)
-    IntegralsOfActivityInRegion(j-1) = trapz(timepoints(1:j).*10,TACFromReferenceRegion(1:j));
+    IntegralsOfActivityInRegion(j-1) = trapz(timepoints(1:j).*lengthFrame,TACFromReferenceRegion(1:j));
 
 end
 

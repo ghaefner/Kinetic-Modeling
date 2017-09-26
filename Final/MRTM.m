@@ -1,10 +1,10 @@
+function [ meanBPsROI, chiSquareROIs, averageK2Primes ] = MRTM( pathImagesToProcessFolder, pathReferenceVOI, pixelOfInterest, sizeROI, startframe, lengthFrame )
+
 tic;
-
 %% Environment
-
-pathImagesToProcessFolder = '/media/mmni_raid2/Filesystem/ghaefner/Kinetic-Modeling/images/';
+%Create Output Directory
+pathImagesToProcessFolder = [pathImagesToProcessFolder, '/'];
 pathOutputFolder = [pathImagesToProcessFolder, 'MRTM/'];
-pathReferenceVOI = [pathImagesToProcessFolder, '../ReferenceVOI/AAL_occipital_49-54_79x95x78.nii'];
 pathK2Primes = [pathImagesToProcessFolder, 'k2Primes/'];
 
 %Create Output Directory
@@ -14,12 +14,8 @@ mkdir(pathK2Primes);
 % Find all Files with .nii-Ending in Input Folder
 subj=dir(strcat(pathImagesToProcessFolder,'*.nii'));
 numberOfFiles=length(subj);
-
-% Get reference image
-referenceVOInii = load_nii(pathReferenceVOI);
-referenceVOI = referenceVOInii.img;
-
-%% Check if k2Prime file already exists and aboard, commented for testing purposes. Isn't that bad after all.
+% 
+% Check if k2Prime file already exists and aboard
 % if exist([pathK2Primes, 'k2Primes.txt'],'file') == 2
 %     disp('ERROR: k2Prime file already existing. Check in the following directory: ');
 %     disp(pathK2Primes);
@@ -35,21 +31,15 @@ fprintf(fileK2,'%s','% k2Prime values given in 1/min');
 fprintf(fileK2,'\n');
 fileK2std = fopen([pathK2Primes, 'stdK2Primes.txt'],'w');
 
-
-%% Define parameters
-timepoints = 1:9;
-startFrame = 3;
 averageK2Primes = zeros(numberOfFiles);
 stDevK2Primes = zeros(numberOfFiles);
-
-%% Run through all of the files
+chiSquareROIs = zeros(numberOfFiles);
 
 for FileNumber = 1:numberOfFiles
     
     currentImagePath = [ pathImagesToProcessFolder subj(FileNumber).name];
-    currentImage = load_nii(currentImagePath);
     
-    [ currentBindingPotentialNii, averageK2Primes(FileNumber), stDevK2Primes(FileNumber)] = fcnMRTM(currentImagePath,pathReferenceVOI, timepoints, startFrame);
+    [ currentBindingPotentialNii, averageK2Primes(FileNumber), stDevK2Primes(FileNumber),chiSquareROI(FileNumber)] = fcnMRTM(currentImagePath,pathReferenceVOI, startframe, lengthFrame, pixelOfInterest);
     
     
     %% Save Output
@@ -64,3 +54,11 @@ for FileNumber = 1:numberOfFiles
 end
 toc;
 fclose('all');
+
+%% Calculate BP ROI
+
+meanBPsROI = calcSlopeROI(pathOutputFolder,pixelOfInterest,sizeROI);
+
+
+end
+

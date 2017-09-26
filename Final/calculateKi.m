@@ -1,4 +1,4 @@
-function [ Patlak_slope, Patlak_intercept ] = calcPatlak(timepoints, startFrame,TAC, TAC_ReferenceVOI, IntegralsOfActivityInReferenceRegion)
+function [ Patlak_slope, Patlak_intercept ] = calculateKi(TAC, timepoints, startFrame, TACFromReferenceRegion, IntegralsOfActivityInReferenceRegion)
 %UNTITLED7 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -8,9 +8,21 @@ lengthTimepoints = length(timepoints);
 x = zeros(1,lengthTimepoints-startFrame);
 y = zeros(1,lengthTimepoints-startFrame);
 
-id = startFrame:lengthTimepoints;
-y(id-startFrame+1) = TAC(id)./TAC_ReferenceVOI(id);
-x(id-startFrame+1) = IntegralsOfActivityInReferenceRegion(id)./TAC_ReferenceVOI(id);
+for i = startFrame:lengthTimepoints
+    %disp(i);
+    y(i-startFrame+1) = TAC(i)/TACFromReferenceRegion(i);
+    x(i-startFrame+1) = IntegralsOfActivityInReferenceRegion(i)/TACFromReferenceRegion(i);
+    
+end
+
+%% Linear Fit to obtain patlak parameters
+
+% % Apply linear model using polyfit... this is slow...
+% p = polyfit(x,y,1);
+% % p(2) is the intercept, p(1) is the slope
+% Patlak_slope = p(1) ;
+% Patlak_intercept = p(2);
+
 
 % Apply linear model using matrix operations... this is is a bit faster...
 % here p2(1) is the intercept, p2(2) is the slope

@@ -28,7 +28,7 @@ for FileNumber = 1:numberOfFiles
     currentImagePath = [pathImagesToProcessFolder subj(FileNumber).name];
     currentImage = load_nii(currentImagePath);
  
-    currentBindingPotentialNii = fcnSRTM(currentImagePath,pathReferenceVOI, timepoints, startFrame);
+    currentBindingPotentialNii = fcnSRTM(currentImagePath,pathReferenceVOI, startframe, lengthFrame);
     
     %% Save Output
     save_nii(currentBindingPotentialNii, [pathOutputFolder 'BP_SRTM_' subj(FileNumber).name]);

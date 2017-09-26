@@ -1,4 +1,4 @@
-function [ LoganSlopeK2, LoganInterceptK2 ] = calcLoganK2( TAC,  timepoints, startFrame, IntegralsOfActivityInReferenceRegion, IntegralsOfActivityInVoxel, averageK2Prime, TAC_ReferenceVOI )
+function [ LoganSlopeK2, LoganInterceptK2,x,y ] = calcLoganK2( TAC,  timepoints, startFrame, IntegralsOfActivityInReferenceRegion, IntegralsOfActivityInVoxel, averageK2Prime, TAC_ReferenceVOI )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 

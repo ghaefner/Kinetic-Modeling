@@ -1,4 +1,4 @@
-function [ Patlak_slope, Patlak_intercept ] = calcPatlak(timepoints, startFrame,TAC, TAC_ReferenceVOI, IntegralsOfActivityInReferenceRegion)
+function [ Patlak_slope, Patlak_intercept,x,y ] = calcPatlak(timepoints, startFrame,TAC, TAC_ReferenceVOI, IntegralsOfActivityInReferenceRegion)
 %UNTITLED7 Summary of this function goes here
 %   Detailed explanation goes here
 
