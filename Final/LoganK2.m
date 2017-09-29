@@ -1,4 +1,4 @@
-function [ meanSlopesROI ] = LoganK2 ( pathImagesToProcessFolder, pathReferenceVOI, pixelOfInterest, sizeROI, startframe, lengthFrame )
+function [ meanSlopesROI, chiSquareROIs ] = LoganK2 ( pathImagesToProcessFolder, pathReferenceVOI, pixelOfInterest, sizeROI, startframe, lengthFrame, numberOfFrames )
 
 tic;
 %Create Output Directory
@@ -22,12 +22,13 @@ else
     disp('All averaged k2 rates are available. ');
 end    
 
+chiSquareROIs = zeros(numberOfFiles,1);
 %% Run through all files in the input folder
 for FileNumber = 1:numberOfFiles
     
     currentImagePath = [pathImagesToProcessFolder subj(FileNumber).name];
     
-    currentLoganSlopesNii = fcnLoganK2Analysis(currentImagePath,pathReferenceVOI, averageK2Primes(FileNumber), startframe, lengthFrame,pixelOfInterest);
+    [ currentLoganSlopesNii, chiSquareROIs(FileNumber) ] = fcnLoganK2Analysis(currentImagePath,pathReferenceVOI, averageK2Primes(FileNumber), startframe, lengthFrame,pixelOfInterest, numberOfFrames);
     
     %% Save output
     save_nii(currentLoganSlopesNii, [pathOutputFolder 'DVR_Logan_' subj(FileNumber).name]);

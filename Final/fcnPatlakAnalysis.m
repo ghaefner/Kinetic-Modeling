@@ -1,4 +1,4 @@
-function [ PatlakSlopes ] = fcnPatlakAnalysis(pathInputImage, pathReferenceVOI, startframe, lengthFrame,pOI,numberOfFrames)
+function [ PatlakSlopes,chiSquareROI ] = fcnPatlakAnalysis(pathInputImage, pathReferenceVOI, startframe, lengthFrame,pOI,numberOfFrames)
 
 %% Load image and referenceVOI
 image4D = load_nii(pathInputImage);
@@ -12,8 +12,8 @@ sizeInputImage = sizeInputImage(1:3);
 xDim = sizeInputImage(1);
 yDim = sizeInputImage(2);
 zDim = sizeInputImage(3);
-timepoints = 1:numberOfFrames:size(image4D.img,4);
 
+timepoints = 1:numberOfFrames:(floor(size(image4D.img,4)/numberOfFrames)*numberOfFrames);
 
 %% Calculate the TAC_ReferenceVOI and activity integral
 TAC_ReferenceVOI = extractTACFromReferenceRegions(image4D, referenceVOI, numberOfFrames);
@@ -21,36 +21,38 @@ IntegralsOfActivityInReferenceRegion = calculateIntegralsOfActivityInReferenceRe
 
 %% Calculate the PatlakSlopes using calculateKi for every voxel
 PatlakSlopes = single(zeros(xDim,yDim,zDim));
-PatlakIntercepts = single(zeros(xDim,yDim,zDim));
-xPatlak = single(zeros(xDim,yDim,zDim,length(timepoints)-startframe+1));
-yPatlak = single(zeros(xDim,yDim,zDim,length(timepoints)-startframe+1));
+% PatlakIntercepts = single(zeros(xDim,yDim,zDim));
+% xPatlak = single(zeros(xDim,yDim,zDim,length(timepoints)-startframe+1));
+% yPatlak = single(zeros(xDim,yDim,zDim,length(timepoints)-startframe+1));
 
 parfor i = 1:xDim
     for j = 1:yDim
         for k = 1:zDim
             TAC = extractTACFromVoxel(image4D, [i j k], numberOfFrames);
-            [PatlakSlopes(i,j,k),PatlakIntercepts(i,j,k),xPatlak(i,j,k,:),yPatlak(i,j,k,:)] = calcPatlak(timepoints, startframe, TAC, TAC_ReferenceVOI, IntegralsOfActivityInReferenceRegion);
-            
+            PatlakSlopes(i,j,k) = calcPatlak(timepoints, startframe, TAC, TAC_ReferenceVOI, IntegralsOfActivityInReferenceRegion);            
         end
     end
 end
 
 %% Plot for pixel of interest to gain a feeling fot the fit goodness
-xData = zeros(size(xPatlak,4));
-yData = zeros(size(yPatlak,4));
+% Get data
+xPatlak = single(zeros(length(timepoints)-startframe+1,1));
+yPatlak = single(zeros(length(timepoints)-startframe+1,1));
 
-idxj = 1:size(xPatlak,4);
-xData(idxj) = xPatlak(pOI(1),pOI(2),pOI(3),idxj);
-yData(idxj) = yPatlak(pOI(1),pOI(2),pOI(3),idxj);
+TAC_ROI = extractTACFromVoxel(image4D,[pOI(1), pOI(2), pOI(3)],numberOfFrames);
+[~,PatlakIntercept,xPatlak(:,1),yPatlak(:,1),chiSquareROI] = calcPatlak(timepoints,startframe,TAC_ROI,TAC_ReferenceVOI,IntegralsOfActivityInReferenceRegion);
 
 figure(1);
 
-plot(xData(startframe:length(timepoints)),yData(startframe:length(timepoints)),'b*');
+% Plot
+plot(xPatlak(:),yPatlak(:),'b*');
+axis([0 max(xPatlak(:))*1.2 0 max(yPatlak(:))*1.2]);
 xlabel('\int_0^T C_{ref}(t)dt / C_{ref}(T)  [min]')
 ylabel('C(T)/C_{ref}(T)')
 hold on
-plot(xData(startframe:length(timepoints)),xData(startframe:length(timepoints))*PatlakSlopes(pOI(1),pOI(2),pOI(3))+PatlakIntercepts(pOI(1),pOI(2),pOI(3)),'r-');
+plot(xPatlak(:),xPatlak(:)*PatlakSlopes(pOI(1),pOI(2),pOI(3))+PatlakIntercept,'r-');
 hold off
+
 
 %% Make slope image
 image4D.hdr.dime.dim(1) = 3;

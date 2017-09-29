@@ -20,7 +20,7 @@ x2 = x(:,2);
 
 %% Use 'regress' operation for multilinear regression
 [coeffs, ~, res] = regress(y,x);
-chiSquare = sum(res.^2)/(sum(y(:)));
+chiSquare = sum(res.^2)/((sum(y(:)))*(nnz(y)-1));
 
 %% Output values
 DVR = abs(coeffs(1));

@@ -1,4 +1,4 @@
-function [meanSlopesROI ] = Logan ( pathImagesToProcessFolder, pathReferenceVOI, pixelOfInterest, sizeROI, startframe, lengthFrame )
+function [meanSlopesROI,chiSquareROIs ] = Logan ( pathImagesToProcessFolder, pathReferenceVOI, pixelOfInterest, sizeROI, startframe, lengthFrame, numberOfFrames )
 
 tic;
 %Create Output Directory
@@ -10,13 +10,15 @@ mkdir(pathOutputFolder);
 subj=dir(strcat(pathImagesToProcessFolder,'*.nii'));
 numberOfFiles=length(subj);
 
+
+chiSquareROIs = zeros(numberOfFiles,1);
 %% Run through all files in the input folder
 
 for FileNumber = 1:numberOfFiles
     
     currentImagePath = [pathImagesToProcessFolder subj(FileNumber).name];
 
-    currentLoganSlopesNii = fcnLoganAnalysis(currentImagePath,pathReferenceVOI, startframe, lengthFrame,pixelOfInterest);
+    [ currentLoganSlopesNii, chiSquareROIs(FileNumber) ] = fcnLoganAnalysis(currentImagePath,pathReferenceVOI, startframe, lengthFrame,pixelOfInterest, numberOfFrames);
     
     %% Save output
     save_nii(currentLoganSlopesNii, [pathOutputFolder 'Logan_' subj(FileNumber).name]);

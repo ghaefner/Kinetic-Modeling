@@ -1,0 +1,135 @@
+%% Running model scripts
+
+% Patlak Function
+function runPatlak_Callback(hObject, eventdata, handles)
+set(handles.programType,'string','Patlak');
+
+pathImage = get(handles.pathInput,'string');
+pathRef =  get(handles.pathReference,'string');
+pathOutput = [pathImage, '/Patlak/'];
+
+x = str2double(get(handles.xCoord,'string'));
+y = str2double(get(handles.yCoord,'string'));
+z = str2double(get(handles.zCoord,'string'));
+ROI = [x y z];
+sizeROI = str2double(get(handles.sizeROI,'string'));
+
+startframe = str2double(get(handles.startFrame,'string'));
+lengthFrame = str2double(get(handles.lengthFrame,'string'));
+numberOfFrames = str2double(get(handles.framesToSum,'string'));
+
+
+meanSlopesROI = Patlak(pathImage,pathRef,ROI,sizeROI,startframe,lengthFrame,numberOfFrames);
+meanSlopeROI = meanSlopesROI(1);
+
+set(handles.slope,'string',meanSlopeROI);
+set(handles.filesWritten,'string','Files written to:');
+set(handles.outputFolder,'string',pathOutput);
+set(handles.pathOutput,'string',pathOutput);
+
+
+% Logan Function
+function runLogan_Callback(hObject, eventdata, handles)
+set(handles.programType,'string','Logan');
+
+pathImage = get(handles.pathInput,'string');
+pathRef =  get(handles.pathReference,'string');
+pathOutput = [pathImage, '/Logan/'];
+
+x = str2double(get(handles.xCoord,'string'));
+y = str2double(get(handles.yCoord,'string'));
+z = str2double(get(handles.zCoord,'string'));
+ROI = [x y z];
+sizeROI = str2double(get(handles.sizeROI,'string'));
+
+startframe = str2double(get(handles.startFrame,'string'));
+lengthFrame = str2double(get(handles.lengthFrame,'string'));
+numberOfFrames = str2double(get(handles.framesToSum,'string'));
+
+meanSlopesROI = Logan(pathImage,pathRef,ROI,sizeROI,startframe,lengthFrame,numberOfFrames);
+meanSlopeROI = meanSlopesROI(1);
+
+set(handles.slope,'string',meanSlopeROI);
+set(handles.filesWritten,'string','Files written to:');
+set(handles.outputFolder,'string',pathOutput);
+
+% LoganK2 Function
+function runLoganK2_Callback(hObject, eventdata, handles)
+set(handles.programType,'string','LoganK2');
+
+pathImage = get(handles.pathInput,'string');
+pathRef =  get(handles.pathReference,'string');
+pathOutput = [pathImage, '/LoganK2/'];
+
+x = str2double(get(handles.xCoord,'string'));
+y = str2double(get(handles.yCoord,'string'));
+z = str2double(get(handles.zCoord,'string'));
+ROI = [x y z];
+sizeROI = str2double(get(handles.sizeROI,'string'));
+
+startframe = str2double(get(handles.startFrame,'string'));
+lengthFrame = str2double(get(handles.lengthFrame,'string'));
+numberOfFrames = str2double(get(handles.framesToSum,'string'));
+
+meanSlopesROI = LoganK2(pathImage,pathRef,ROI,sizeROI,startframe,lengthFrame, numberOfFrames);
+meanSlopeROI = meanSlopesROI(1);
+
+set(handles.slope,'string',meanSlopeROI);
+set(handles.filesWritten,'string','Files written to:');
+set(handles.outputFolder,'string',pathOutput);
+
+% MRTM Function
+function runMRTM_Callback(hObject, eventdata, handles)
+set(handles.programType,'string','MRTM');
+
+pathImage = get(handles.pathInput,'string');
+pathRef =  get(handles.pathReference,'string');
+pathOutput = [pathImage, '/MRTM/'];
+
+x = str2double(get(handles.xCoord,'string'));
+y = str2double(get(handles.yCoord,'string'));
+z = str2double(get(handles.zCoord,'string'));
+ROI = [x y z];
+sizeROI = str2double(get(handles.sizeROI,'string'));
+
+startframe = str2double(get(handles.startFrame,'string'));
+lengthFrame = str2double(get(handles.lengthFrame,'string'));
+numberOfFrames = str2double(get(handles.framesToSum,'string'));
+
+[meanSlopesROI,chiSquaresROI,averageK2Primes] = MRTM(pathImage,pathRef,ROI,sizeROI,startframe,lengthFrame,numberOfFrames);
+meanSlopeROI = meanSlopesROI(1);
+chiSquareROI = chiSquaresROI(1);
+averageK2Prime = averageK2Primes(1);
+disp(chiSquareROI);
+
+set(handles.slope,'string',meanSlopeROI);
+set(handles.filesWritten,'string','Files written to:');
+set(handles.outputFolder,'string',pathOutput);
+
+
+% SRTM Funcion
+function runSRTM_Callback(hObject, eventdata, handles)
+set(handles.programType,'string','SRTM');
+
+pathImage = get(handles.pathInput,'string');
+pathRef =  get(handles.pathReference,'string');
+pathOutput = [pathImage, '/SRTM/'];
+
+x = str2double(get(handles.xCoord,'string'));
+y = str2double(get(handles.yCoord,'string'));
+z = str2double(get(handles.zCoord,'string'));
+ROI = [x y z];
+sizeROI = str2double(get(handles.sizeROI,'string'));
+
+startframe = str2double(get(handles.startFrame,'string'));
+lengthFrame = str2double(get(handles.lengthFrame,'string'));
+numberOfFrames = str2double(get(handles.framesToSum,'string'));
+
+[meanSlopesROI,chiSquaresROI,averageK2s] = SRTM(pathImage,pathRef,ROI,sizeROI,startframe,lengthFrame,numberOfFrames);
+meanSlopeROI = meanSlopesROI(1);
+chiSquareROI = chiSquaresROI(1);
+averageK2 = averageK2s(1);
+
+set(handles.slope,'string',meanSlopeROI);
+set(handles.filesWritten,'string','Files written to:');
+set(handles.outputFolder,'string',pathOutput);

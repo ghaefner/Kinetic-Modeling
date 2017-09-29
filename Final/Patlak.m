@@ -1,4 +1,4 @@
-function [meanSlopesROI ] = Patlak( pathImagesToProcessFolder, pathReferenceVOI, pixelOfInterest, sizeROI, startframe, lengthFrame, numberOfFrames )
+function [meanSlopesROI,chiSquareROIs ] = Patlak( pathImagesToProcessFolder, pathReferenceVOI, pixelOfInterest, sizeROI, startframe, lengthFrame, numberOfFrames )
 
 
 tic;
@@ -11,13 +11,14 @@ mkdir(pathOutputFolder);
 subj=dir(strcat(pathImagesToProcessFolder,'*.nii'));
 numberOfFiles=length(subj);
 
+chiSquareROIs = zeros(numberOfFiles,1);
 %% Run through all files in the input folder
 
 for FileNumber = 1:numberOfFiles
     
     currentImagePath = [pathImagesToProcessFolder subj(FileNumber).name];
     
-    currentPatlakSlopesNii = fcnPatlakAnalysis(currentImagePath,pathReferenceVOI, startframe, lengthFrame,pixelOfInterest,numberOfFrames);
+    [ currentPatlakSlopesNii, chiSquareROIs(FileNumber) ] = fcnPatlakAnalysis(currentImagePath,pathReferenceVOI, startframe, lengthFrame,pixelOfInterest,numberOfFrames);
     
     %% Save output
     save_nii(currentPatlakSlopesNii, [pathOutputFolder 'K_Patlak_' subj(FileNumber).name]);

@@ -18,7 +18,7 @@ x2 = xValues(:,2);
 
 %% Use 'regress' operation for multilinear regression
 [coeffs,~,res] = regress(yValues,xValues);
-chiSquare = sum(res(:).^2)/sum(yValues(:));
+chiSquare = sum(res(:).^2)/(sum(yValues(:))*(nnz(yValues)-1));
 
 BP = coeffs(1) -1;
 k2 = -coeffs(1)/coeffs(2);

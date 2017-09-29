@@ -1,4 +1,4 @@
-function [ LoganSlopes ] = fcnLoganAnalysis ( pathInputImage, pathReferenceVOI, startframe, lengthFrame, pOI )
+function [ LoganSlopes,chiSquareROI ] = fcnLoganAnalysis ( pathInputImage, pathReferenceVOI, startframe, lengthFrame, pOI, numberOfFrames )
 %UNTITLED3 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -13,51 +13,49 @@ sizeInputImage = sizeInputImage(1:3);
 xDim = sizeInputImage(1);
 yDim = sizeInputImage(2);
 zDim = sizeInputImage(3);
-timepoints = 1:size(image4D.img,4);
+
+timepoints = 1:numberOfFrames:(floor(size(image4D.img,4)/numberOfFrames)*numberOfFrames);
 
 LoganSlopes = single(zeros(xDim,yDim,zDim));
-LoganIntercepts = single(zeros(xDim,yDim,zDim));
-xLogan = single(zeros(xDim,yDim,zDim,length(timepoints)-startframe+1));
-yLogan = single(zeros(xDim,yDim,zDim,length(timepoints)-startframe+1));
 
 %% Calculate the TAC_ReferenceVOI and activity integral
 
-TAC_ReferenceVOI = extractTACFromReferenceRegions( image4D, referenceVOI );
-IntegralsOfActivityInReferenceRegion = calculateIntegralsOfActivityInReferenceRegion(timepoints, startframe, TAC_ReferenceVOI, lengthFrame);
+TAC_ReferenceVOI = extractTACFromReferenceRegions( image4D, referenceVOI, numberOfFrames );
+IntegralsOfActivityInReferenceRegion = calculateIntegralsOfActivityInReferenceRegion(startframe, TAC_ReferenceVOI, lengthFrame, numberOfFrames);
 
 
 parfor i = 1:xDim
     for j = 1:yDim
         for k = 1:zDim
-            
-            TAC = extractTACFromVoxel(image4D, [i j k]);            
-            IntegralsOfActivityInVoxel = calculateIntegralsOfActivityInVoxel( timepoints,1,TAC,lengthFrame );
-            [LoganSlopes(i,j,k),LoganIntercepts(i,j,k),xLogan(i,j,k,:),yLogan(i,j,k,:)] = calcLogan(timepoints, startframe, TAC, IntegralsOfActivityInVoxel, IntegralsOfActivityInReferenceRegion);
+            TAC = extractTACFromVoxel(image4D, [i j k], numberOfFrames);            
+            IntegralsOfActivityInVoxel = calculateIntegralsOfActivityInVoxel( startframe,TAC,lengthFrame,numberOfFrames );
+            LoganSlopes(i,j,k) = calcLogan(timepoints, startframe, TAC, IntegralsOfActivityInReferenceRegion, IntegralsOfActivityInVoxel);
             
         end
     end
 end
 
-disp(xLogan(pOI(1),pOI(2),pOI(3),:));
 
 %% Plot data for ROI
-xData = zeros(1,size(xLogan,4));
-yData = zeros(1,size(yLogan,4));
+% Get data
+xLogan = zeros(length(timepoints)-startframe+1,1);
+yLogan = zeros(length(timepoints)-startframe+1,1);
 
-idxj = 1:size(xLogan,4);
-xData(idxj) = xLogan(pOI(1),pOI(2),pOI(3),idxj);
-yData(idxj) = yLogan(pOI(1),pOI(2),pOI(3),idxj);
-
+TAC_ROI = extractTACFromVoxel(image4D, [pOI(1), pOI(2), pOI(3)], numberOfFrames);            
+IntegralsOfActivityInVoxel = calculateIntegralsOfActivityInVoxel( startframe,TAC_ROI,lengthFrame,numberOfFrames );
+[~,LoganIntercept,xLogan(:),yLogan(:),chiSquareROI] = calcLogan(timepoints, startframe, TAC_ROI, IntegralsOfActivityInReferenceRegion, IntegralsOfActivityInVoxel);
+            
+% Plot
 figure(1);
 
-plot(xData(startframe:length(timepoints)),yData(startframe:length(timepoints)),'b*');
-axis([0 max(xData(:))*1.3 0 max(yData(:))*1.3 ]);
-disp(xData);
-%disp(yData);
+plot(xLogan(:),yLogan(:),'b*');
+axis([0 max(xLogan(:))*1.2 0 max(yLogan(:))*1.2 ]);
+disp(xLogan);
+%disp(yLogan);
 xlabel('\int_0^T C_{ref}(t)dt / C(T)  [min]')
 ylabel('\int_0^TC(t)dt/C(T)  [min]')
 hold on
-plot(xData(startframe:length(timepoints)),xData(startframe:length(timepoints))*LoganSlopes(pOI(1),pOI(2),pOI(3))+LoganIntercepts(pOI(1),pOI(2),pOI(3)),'r-');
+plot(xLogan(:),xLogan(:)*LoganSlopes(pOI(1),pOI(2),pOI(3))+LoganIntercept,'r-');
 hold off
 
 

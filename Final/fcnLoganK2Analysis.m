@@ -1,4 +1,4 @@
-function [ DVRs ] = fcnLoganK2Analysis ( pathInputImage, pathReferenceVOI, averageK2Prime, startframe, lengthFrame,pOI)
+function [ DVRs, chiSquareROI ] = fcnLoganK2Analysis ( pathInputImage, pathReferenceVOI, averageK2Prime, startframe, lengthFrame,pOI, numberOfFrames)
 %UNTITLED3 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -13,51 +13,48 @@ sizeInputImage = sizeInputImage(1:3);
 xDim = sizeInputImage(1);
 yDim = sizeInputImage(2);
 zDim = sizeInputImage(3);
-timepoints = 1:size(image4D.img,4);
+
+timepoints = 1:numberOfFrames:(floor(size(image4D.img,4)/numberOfFrames)*numberOfFrames);
 
 DVRs = single(zeros(xDim,yDim,zDim));
-LoganK2Intercepts = single(zeros(xDim,yDim,zDim));
-xLoganK2 = single(zeros(xDim,yDim,zDim,length(timepoints)-startframe+1));
-yLoganK2 = single(zeros(xDim,yDim,zDim,length(timepoints)-startframe+1));
 
 %% Calculate the TAC_ReferenceVOI and activity integral
-
-
-TAC_ReferenceVOI = extractTACFromReferenceRegions( image4D, referenceVOI );
-IntegralsOfActivityInReferenceRegion = calculateIntegralsOfActivityInReferenceRegion(timepoints, startframe, TAC_ReferenceVOI, lengthFrame);
+TAC_ReferenceVOI = extractTACFromReferenceRegions( image4D, referenceVOI, numberOfFrames );
+IntegralsOfActivityInReferenceRegion = calculateIntegralsOfActivityInReferenceRegion(startframe, TAC_ReferenceVOI, lengthFrame, numberOfFrames);
 
 
 parfor i = 1:xDim
+    warning('off','all');
     for j = 1:yDim
         for k = 1:zDim
-            TAC = extractTACFromVoxel(image4D, [i j k]);            
-            IntegralsOfActivityInVoxel = calculateIntegralsOfActivityInVoxel( timepoints,startframe,TAC,lengthFrame );
-            [DVRs(i,j,k),LoganK2Intercepts(i,j,k),xLoganK2(i,j,k,:),yLoganK2(i,j,k,:)] = calcLoganK2(TAC, timepoints, startframe, IntegralsOfActivityInVoxel, IntegralsOfActivityInReferenceRegion, averageK2Prime, TAC_ReferenceVOI);
+            TAC = extractTACFromVoxel(image4D, [i j k], numberOfFrames);            
+            IntegralsOfActivityInVoxel = calculateIntegralsOfActivityInVoxel(startframe,TAC,lengthFrame, numberOfFrames );
+            DVRs(i,j,k) = calcLoganK2(TAC, timepoints, startframe, IntegralsOfActivityInReferenceRegion,IntegralsOfActivityInVoxel, averageK2Prime, TAC_ReferenceVOI);
             
         end
     end
 end
-% Eliminate unphysiological values
-%DVRs = DVRs.*double(DVRs < 20);
+
 
 %% Plot data for ROI
-xData = zeros(1,size(xLoganK2,4));
-yData = zeros(1,size(yLoganK2,4));
+% Get data
+xLoganK2 = zeros(length(timepoints)-startframe+1,1);
+yLoganK2 = zeros(length(timepoints)-startframe+1,1);
 
-idxj = 1:size(xLoganK2,4);
-xData(idxj) = xLoganK2(pOI(1),pOI(2),pOI(3),idxj);
-yData(idxj) = yLoganK2(pOI(1),pOI(2),pOI(3),idxj);
+TAC = extractTACFromVoxel(image4D, [pOI(1), pOI(2), pOI(3)], numberOfFrames);            
+IntegralsOfActivityInVoxel = calculateIntegralsOfActivityInVoxel( startframe,TAC,lengthFrame,numberOfFrames );
+[~,LoganK2Intercept,xLoganK2(:),yLoganK2(:),chiSquareROI] = calcLoganK2(TAC, timepoints, startframe, IntegralsOfActivityInReferenceRegion, IntegralsOfActivityInVoxel, averageK2Prime, TAC_ReferenceVOI);
 
-disp(xData);
-disp(yData);
+% Plot
 
 figure(1);
 
-plot(xData((startframe:length(timepoints))),yData(startframe:length(timepoints)),'b*');
+plot(xLoganK2(:),yLoganK2(:),'b*');
+axis([0 max(xLoganK2(:))*1.3 0 max(yLoganK2(:))*1.3 ]);
 ylabel('\int_0^T C(t)dt / C(T)  [min]')
 xlabel('(\int_0^TC_{ref}(t)dt+C_{ref}(T)/k2_{ref})/C(T)  [min]')
 hold on
-plot((xData(startframe:length(timepoints))),xData(startframe:length(timepoints))*DVRs(pOI(1),pOI(2),pOI(3))+LoganK2Intercepts(pOI(1),pOI(2),pOI(3)),'r-');
+plot(xLoganK2(:),xLoganK2(:)*DVRs(pOI(1),pOI(2),pOI(3))+LoganK2Intercept,'r-');
 hold off
 
 

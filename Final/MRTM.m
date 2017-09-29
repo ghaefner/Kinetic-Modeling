@@ -1,4 +1,4 @@
-function [ meanBPsROI, chiSquareROIs, averageK2Primes ] = MRTM( pathImagesToProcessFolder, pathReferenceVOI, pixelOfInterest, sizeROI, startframe, lengthFrame )
+function [ meanBPsROI, chiSquareROIs, averageK2Primes ] = MRTM( pathImagesToProcessFolder, pathReferenceVOI, pixelOfInterest, sizeROI, startframe, lengthFrame, numberOfFrames )
 
 tic;
 %% Environment
@@ -39,7 +39,7 @@ for FileNumber = 1:numberOfFiles
     
     currentImagePath = [ pathImagesToProcessFolder subj(FileNumber).name];
     
-    [ currentBindingPotentialNii, averageK2Primes(FileNumber), stDevK2Primes(FileNumber),chiSquareROI(FileNumber)] = fcnMRTM(currentImagePath,pathReferenceVOI, startframe, lengthFrame, pixelOfInterest);
+    [ currentBindingPotentialNii, averageK2Primes(FileNumber), stDevK2Primes(FileNumber),chiSquareROIs(FileNumber)] = fcnMRTM(currentImagePath,pathReferenceVOI, startframe, lengthFrame, pixelOfInterest, numberOfFrames);
     
     
     %% Save Output
